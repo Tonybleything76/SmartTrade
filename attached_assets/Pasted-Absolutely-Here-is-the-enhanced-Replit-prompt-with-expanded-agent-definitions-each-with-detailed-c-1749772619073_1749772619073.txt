@@ -1,0 +1,146 @@
+Absolutely. Here is the enhanced Replit prompt with expanded agent definitions, each with detailed context, expertise, tools, and background tasks they perform in collaboration to fulfill their role. This version is designed for a highly realistic, role-based multi-agent simulation in a LangGraph-style orchestration system.
+
+⸻
+
+✅ Enhanced Replit Project Prompt: Multi-Agent AI Content Workflow System
+
+Use this prompt to launch development in Replit for a role-aware, tool-equipped, AI-specialist content marketing system.
+
+⸻
+
+🧠 System Purpose
+
+Build a multi-agent system that autonomously generates and publishes high-quality, brand-aligned LinkedIn posts based on trending topics in AI innovation. Each agent represents a domain expert operating in a real-world role, collaborating to simulate an expert marketing workflow.
+
+⸻
+
+🎯 Goal
+
+Produce 3 high-quality LinkedIn posts daily (9am, 12pm, 5pm) on topics including:
+	•	AI Innovation
+	•	Generative AI
+	•	Technology Roadmaps & Integration
+	•	AI for Professionals
+	•	Agentic Systems
+
+⸻
+
+👥 Agent Definitions & Role Context
+
+1. Orchestration Agent
+	•	Role: Chief Content Officer / Workflow Manager
+	•	Background: Senior AI strategist and content operations leader. Understands full publishing workflow and quality standards.
+	•	Tools: Internal memory state, content validation rules, content scoring heuristics
+	•	Tasks:
+	•	Initiates the daily pipeline
+	•	Verifies content alignment with topic pillars
+	•	Approves, rejects, or routes posts based on editor feedback
+	•	Logs decisions and updates status tracking
+	•	Coordinates retry logic and escalates edge cases
+
+2. Trend Researcher Agent
+	•	Role: AI Trends Analyst
+	•	Background: Expert in AI research analysis with deep understanding of emerging models, industry use cases, and technology discourse.
+	•	Tools: Web scraping APIs (Substack, Medium, Beehive, Arxiv), OpenAI Web Retrieval Tool, RSS feeds
+	•	Tasks:
+	•	Identifies top 5–10 trending topics daily
+	•	Filters for relevance to 8 core themes
+	•	Summarizes each topic in 3–4 sentences
+	•	Ranks them by novelty, authority, and engagement potential
+
+3. Content Developer Agent
+	•	Role: AI-Powered Copywriter
+	•	Background: Trained in brand storytelling, AI communication, and thought leadership content
+	•	Tools: OpenAI GPT-4-turbo or Claude 3, prompt templates, tone/style guides
+	•	Tasks:
+	•	Selects top topics from the researcher
+	•	Writes posts using a proven format (Hook → Insight → CTA → Hashtags)
+	•	Emphasizes clarity, leadership tone, and audience value
+	•	Returns drafts in markdown with bolded keywords
+
+4. Content Editor Agent
+	•	Role: Fact Checker / Brand Editor
+	•	Background: Journalism and NLP expert trained to detect AI hallucinations and check alignment with company messaging
+	•	Tools: OpenAI Moderation endpoint, fact-checking APIs (Wolfram, Google Knowledge Graph)
+	•	Tasks:
+	•	Reviews drafts for tone, grammar, and clarity
+	•	Flags hallucinations, weak CTAs, or off-brand voice
+	•	Scores each draft (1–5) and returns structured feedback
+	•	Suggests improvements when rejected
+
+5. Distribution Agent
+	•	Role: Platform Publisher / Social Media Manager
+	•	Background: Expert in social platform APIs and publishing best practices for engagement
+	•	Tools: LinkedIn API, X API, Meta Graph API, OpenAI image generation (DALL·E)
+	•	Tasks:
+	•	Publishes approved posts to organization page(s)
+	•	Attaches brand-aligned visual assets
+	•	Logs post ID, platform, status, and timestamp
+	•	Returns confirmation for scheduler
+
+6. Content Scheduler Agent
+	•	Role: Automation Specialist / Calendar Coordinator
+	•	Background: Backend automation engineer who ensures timely delivery across timezones
+	•	Tools: APScheduler, Google Calendar API, Cron logic
+	•	Tasks:
+	•	Receives approved posts
+	•	Schedules posts for 9 AM, 12 PM, and 5 PM daily
+	•	Prevents duplicates, errors, or time conflicts
+	•	Logs upcoming content and triggers alerts if conflicts arise
+
+⸻
+
+📂 Folder Structure
+
+/agents/
+  orchestration.py
+  trend_researcher.py
+  content_developer.py
+  content_editor.py
+  distribution.py
+  scheduler.py
+
+main.py
+workflow.yaml
+.env
+requirements.txt
+
+
+⸻
+
+🔧 Tech Stack
+	•	Language: Python 3.10+
+	•	Libraries:
+	•	openai, schedule or APScheduler
+	•	uuid, dotenv, requests
+	•	(Optional: langchain, crewai, autogen, fastapi)
+
+⸻
+
+🧾 Sample Output (Post Review Log)
+
+{
+  "post_id": "uuid-91a4",
+  "status": "Approved",
+  "topic": "Emerging Use Cases of Agentic Systems in SaaS",
+  "score": 4.8,
+  "editor_feedback": "Clear, insightful, good CTA",
+  "scheduled_times": ["09:00", "12:00", "17:00"],
+  "platforms": ["LinkedIn", "X"],
+  "image_generated": true,
+  "logged_at": "2025-06-12T08:58:22Z"
+}
+
+
+⸻
+
+✅ Next Step
+
+If you’d like, I can now generate:
+	•	base_agent.py class template
+	•	orchestration.py agent script
+	•	main.py orchestration runner
+	•	.env.example
+	•	requirements.txt
+
+Would you like me to create this full starter kit for your Replit project?
