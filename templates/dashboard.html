@@ -53,7 +53,7 @@
                                 <div class="d-flex align-items-center">
                                     <div class="flex-grow-1">
                                         <h5 class="card-title mb-0">Total Workflows</h5>
-                                        <h3 class="mb-0">{{ (data.get('metrics', {}).get('total_workflows', 0)) }}</h3>
+                                        <h3 class="mb-0">{{ data.get('metrics', {}).get('total_workflows', 0) }}</h3>
                                     </div>
                                     <i class="fas fa-cogs fa-2x opacity-75"></i>
                                 </div>
@@ -86,7 +86,7 @@
                                 <div class="d-flex align-items-center">
                                     <div class="flex-grow-1">
                                         <h5 class="card-title mb-0">Today's Content</h5>
-                                        <h3 class="mb-0">{{ data.today_stats.content_generated or 0 }}</h3>
+                                        <h3 class="mb-0">{{ data.get('today_stats', {}).get('content_generated', 0) }}</h3>
                                     </div>
                                     <i class="fas fa-file-alt fa-2x opacity-75"></i>
                                 </div>
@@ -100,8 +100,9 @@
                                     <div class="flex-grow-1">
                                         <h5 class="card-title mb-0">Avg Duration</h5>
                                         <h3 class="mb-0">
-                                            {% if data.metrics.average_duration_seconds %}
-                                                {{ "%.0f"|format(data.metrics.average_duration_seconds) }}s
+                                            {% set metrics = data.get('metrics', {}) %}
+                                            {% if metrics.get('average_duration_seconds') %}
+                                                {{ "%.0f"|format(metrics.get('average_duration_seconds', 0)) }}s
                                             {% else %}
                                                 N/A
                                             {% endif %}
@@ -157,13 +158,12 @@
                         </button>
                     </div>
                     <div class="card-body">
-                        <div id="scheduledPosts" class="row">
-                            <!-- Scheduled posts will be loaded here via JavaScript -->
-                        </div>
-                        <div class="text-center mt-3">
-                            <div class="spinner-border text-primary" role="status" id="contentLoader">
-                                <span class="visually-hidden">Loading content...</span>
-                            </div>
+                        <div class="text-center">
+                            <p class="text-muted mb-3">Review and manage your scheduled LinkedIn posts</p>
+                            <a href="/content-review" class="btn btn-primary">
+                                <i class="fas fa-eye me-2"></i>
+                                View Content Review Dashboard
+                            </a>
                         </div>
                     </div>
                 </div>

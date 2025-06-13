@@ -303,6 +303,100 @@ def create_app():
                 "error": str(e)
             }), 500
     
+    @app.route('/content-review')
+    def content_review():
+        """Content review page"""
+        return render_template('content_review.html')
+
+    @app.route('/api/publish-now', methods=['POST'])
+    def api_publish_now():
+        """API endpoint to publish content immediately"""
+        try:
+            data = request.get_json()
+            job_id = data.get('job_id')
+            
+            if not job_id:
+                return jsonify({
+                    "success": False,
+                    "error": "Job ID is required"
+                }), 400
+            
+            wf = get_workflow()
+            scheduler_agent = wf.agents.get('scheduler')
+            
+            if not scheduler_agent:
+                return jsonify({
+                    "success": False,
+                    "error": "Scheduler agent not available"
+                }), 500
+            
+            # Execute immediate publishing
+            result = scheduler_agent.execute_scheduled_publishing(job_id)
+            
+            return jsonify({
+                "success": True,
+                "data": result
+            })
+            
+        except Exception as e:
+            logger.error(f"Publish now API error: {e}")
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
+
+    @app.route('/api/update-content', methods=['POST'])
+    def api_update_content():
+        """API endpoint to update scheduled content"""
+        try:
+            data = request.get_json()
+            job_id = data.get('job_id')
+            updated_content = data.get('content')
+            
+            if not job_id or not updated_content:
+                return jsonify({
+                    "success": False,
+                    "error": "Job ID and content are required"
+                }), 400
+            
+            wf = get_workflow()
+            scheduler_agent = wf.agents.get('scheduler')
+            
+            if not scheduler_agent:
+                return jsonify({
+                    "success": False,
+                    "error": "Scheduler agent not available"
+                }), 500
+            
+            # Update content in scheduler
+            if hasattr(scheduler_agent, 'scheduled_posts') and job_id in scheduler_agent.scheduled_posts:
+                post = scheduler_agent.scheduled_posts[job_id]
+                post['content'].update(updated_content)
+                
+                # Recalculate reading time and word count
+                text = updated_content.get('text', '')
+                post['content']['word_count'] = len(text.split())
+                post['content']['reading_time_seconds'] = max(30, len(text.split()) * 0.4)
+                
+                logger.info(f"Updated content for job {job_id}")
+                
+                return jsonify({
+                    "success": True,
+                    "data": {"message": "Content updated successfully"}
+                })
+            else:
+                return jsonify({
+                    "success": False,
+                    "error": "Scheduled post not found"
+                }), 404
+            
+        except Exception as e:
+            logger.error(f"Update content API error: {e}")
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
+
     @app.route('/api/metrics')
     def api_metrics():
         """API endpoint for system metrics"""
