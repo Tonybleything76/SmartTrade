@@ -115,13 +115,16 @@ class RoadmapGeneratorAgent(BaseAgent):
                 "objectives": ai_objectives,
                 "framework": primary_framework,
                 "timeline": timeline_preference,
-                "phases": detailed_roadmap["phases"],
-                "milestones": detailed_roadmap["milestones"],
-                "deliverables": detailed_roadmap["deliverables"],
-                "resource_requirements": detailed_roadmap["resources"],
+                "phases": roadmap_data.get("phases", []),
+                "milestones": roadmap_data.get("milestones", []),
+                "deliverables": self.extract_deliverables_from_phases(roadmap_data.get("phases", [])),
+                "resource_requirements": roadmap_data.get("resources", {}),
                 "risk_assessment": risk_assessment,
-                "success_metrics": detailed_roadmap["success_metrics"],
-                "recommendations": detailed_roadmap["recommendations"]
+                "success_metrics": roadmap_data.get("success_metrics", []),
+                "recommendations": roadmap_data.get("recommendations", []),
+                "workshops": detailed_roadmap.get("workshops", []),
+                "design_thinking_integration": detailed_roadmap.get("design_thinking_integration", []),
+                "methodology": detailed_roadmap.get("methodology", {})
             }
             
             self.log_message(f"Generated AI implementation roadmap with {len(complete_roadmap['phases'])} phases")
@@ -243,16 +246,24 @@ class RoadmapGeneratorAgent(BaseAgent):
             self.log_message(f"Error generating AI roadmap: {str(e)}", "error")
             raise e
     
+    def extract_deliverables_from_phases(self, phases: List[Dict[str, Any]]) -> List[str]:
+        """Extract all deliverables from phases"""
+        deliverables = []
+        for phase in phases:
+            phase_deliverables = phase.get("deliverables", [])
+            deliverables.extend(phase_deliverables)
+        return deliverables
+    
     def add_implementation_details(self, roadmap_data: Dict[str, Any], framework: str) -> Dict[str, Any]:
         """Add detailed implementation specifics to the roadmap"""
         # Add methodology recommendations
         roadmap_data["methodology"] = self.recommend_methodology(roadmap_data)
         
         # Add workshop and training components
-        roadmap_data["workshops"] = self.generate_workshop_plan(roadmap_data["phases"])
+        roadmap_data["workshops"] = self.generate_workshop_plan(roadmap_data.get("phases", []))
         
         # Add Design Thinking integration points
-        roadmap_data["design_thinking_integration"] = self.integrate_design_thinking(roadmap_data["phases"])
+        roadmap_data["design_thinking_integration"] = self.integrate_design_thinking(roadmap_data.get("phases", []))
         
         return roadmap_data
     
