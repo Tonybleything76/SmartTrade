@@ -9,7 +9,7 @@ import json
 import requests
 from datetime import datetime, timedelta
 from typing import Dict, Any, List
-import trafilatura
+from serpapi import GoogleSearch
 
 from agents.base_agent import BaseAgent
 from openai import OpenAI
@@ -21,30 +21,46 @@ class TrendResearcherAgent(BaseAgent):
         super().__init__(
             name="Trend Researcher Agent", 
             role="AI Trends Analyst",
-            tools=["web_scraping", "rss_feeds", "openai_analysis", "trend_ranking"]
+            tools=["serpapi_search", "google_news", "openai_analysis", "trend_ranking"]
         )
         
         # Initialize OpenAI client
         self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         
-        # Research sources configuration
-        self.research_sources = {
-            "ai_news_sites": [
-                "https://venturebeat.com/ai/",
-                "https://techcrunch.com/category/artificial-intelligence/",
-                "https://www.artificialintelligence-news.com/",
-                "https://aimagazine.com/",
-                "https://www.theverge.com/ai-artificial-intelligence"
+        # Initialize SerpAPI client
+        self.serpapi_key = os.getenv("SERPAPI_API_KEY")
+        
+        # Search query configurations for different AI topics
+        self.search_queries = {
+            "ai_innovation": [
+                "AI innovation 2024 breakthrough",
+                "artificial intelligence new technology",
+                "AI startup funding news",
+                "machine learning breakthrough"
             ],
-            "academic_sources": [
-                "https://arxiv.org/list/cs.AI/recent",
-                "https://arxiv.org/list/cs.LG/recent"
+            "generative_ai": [
+                "generative AI news 2024",
+                "GPT ChatGPT latest updates",
+                "AI content generation tools",
+                "text to image AI models"
             ],
-            "industry_blogs": [
-                "https://openai.com/blog/",
-                "https://blog.google/technology/ai/",
-                "https://blogs.microsoft.com/ai/",
-                "https://www.anthropic.com/news"
+            "ai_for_professionals": [
+                "AI tools for professionals",
+                "workplace AI automation",
+                "AI productivity software",
+                "business AI implementation"
+            ],
+            "agentic_systems": [
+                "AI agents autonomous systems",
+                "multi-agent AI systems",
+                "AI workflow automation",
+                "intelligent agent frameworks"
+            ],
+            "tech_integration": [
+                "AI integration enterprise",
+                "AI technology roadmap",
+                "AI adoption trends",
+                "AI transformation strategy"
             ]
         }
         
@@ -75,21 +91,26 @@ class TrendResearcherAgent(BaseAgent):
             return self.create_response(False, error=f"Unknown task type: {task_type}")
     
     def research_trending_topics(self, topics: List[str], max_trends: int = 10) -> Dict[str, Any]:
-        """Research trending topics across multiple sources"""
+        """Research trending topics using SerpAPI"""
         self.log_message(f"Starting trend research for {len(topics)} topic categories")
+        
+        if not self.serpapi_key:
+            return self.create_response(False, error="SerpAPI key not configured")
         
         try:
             all_trends = []
+            searches_performed = 0
             
-            # Scrape content from different source categories
-            for source_type, urls in self.research_sources.items():
-                self.log_message(f"Researching {source_type} sources...")
+            # Search for trends using SerpAPI
+            for query_category, queries in self.search_queries.items():
+                self.log_message(f"Searching {query_category} trends...")
                 
-                trends_from_source = self.scrape_source_category(urls, topics, source_type)
-                all_trends.extend(trends_from_source)
+                trends_from_category = self.search_trends_with_serpapi(queries, query_category)
+                all_trends.extend(trends_from_category)
+                searches_performed += len(queries)
             
             if not all_trends:
-                return self.create_response(False, error="No trends found from any sources")
+                return self.create_response(False, error="No trends found from searches")
             
             # Rank and filter trends
             ranked_trends = self.rank_trends(all_trends, max_trends)
@@ -100,7 +121,7 @@ class TrendResearcherAgent(BaseAgent):
             return self.create_response(True, {
                 "trends": enhanced_trends,
                 "total_found": len(all_trends),
-                "sources_checked": sum(len(urls) for urls in self.research_sources.values()),
+                "searches_performed": searches_performed,
                 "research_timestamp": datetime.utcnow().isoformat()
             })
             
@@ -108,32 +129,108 @@ class TrendResearcherAgent(BaseAgent):
             self.log_message(f"Trend research failed: {e}", level="error")
             return self.create_response(False, error=f"Trend research failed: {e}")
     
-    def scrape_source_category(self, urls: List[str], topics: List[str], source_type: str) -> List[Dict[str, Any]]:
-        """Scrape content from a category of sources"""
+    def search_trends_with_serpapi(self, queries: List[str], category: str) -> List[Dict[str, Any]]:
+        """Search for trends using SerpAPI"""
         trends = []
         
-        for url in urls:
+        for query in queries:
             try:
-                self.log_message(f"Scraping {url}")
+                self.log_message(f"Searching: {query}")
                 
-                # Get website content using trafilatura
-                downloaded = trafilatura.fetch_url(url)
-                if not downloaded:
-                    continue
-                    
-                text_content = trafilatura.extract(downloaded)
-                if not text_content:
-                    continue
+                # Search Google News for recent AI trends
+                search = GoogleSearch({
+                    "q": query,
+                    "tbm": "nws",  # News search
+                    "api_key": self.serpapi_key,
+                    "num": 10,
+                    "tbs": "qdr:w"  # Past week
+                })
                 
-                # Extract trends from content using AI
-                extracted_trends = self.extract_trends_from_content(text_content, topics, url, source_type)
-                trends.extend(extracted_trends)
+                results = search.get_dict()
+                
+                if "news_results" in results:
+                    for news_item in results["news_results"]:
+                        trend = self.extract_trend_from_news_item(news_item, category, query)
+                        if trend:
+                            trends.append(trend)
+                
+                # Also search regular results for additional context
+                search_general = GoogleSearch({
+                    "q": query,
+                    "api_key": self.serpapi_key,
+                    "num": 5
+                })
+                
+                general_results = search_general.get_dict()
+                
+                if "organic_results" in general_results:
+                    for result in general_results["organic_results"]:
+                        trend = self.extract_trend_from_search_result(result, category, query)
+                        if trend:
+                            trends.append(trend)
                 
             except Exception as e:
-                self.log_message(f"Failed to scrape {url}: {e}", level="warning")
+                self.log_message(f"Failed to search '{query}': {e}", level="warning")
                 continue
         
+        self.log_message(f"Found {len(trends)} trends from {category} searches")
         return trends
+    
+    def extract_trend_from_news_item(self, news_item: Dict[str, Any], category: str, query: str) -> Dict[str, Any]:
+        """Extract trend information from a news search result"""
+        try:
+            title = news_item.get("title", "")
+            snippet = news_item.get("snippet", "")
+            source = news_item.get("source", "")
+            date = news_item.get("date", "")
+            link = news_item.get("link", "")
+            
+            if not title or len(title) < 10:
+                return None
+                
+            return {
+                "title": title,
+                "summary": snippet,
+                "category": category,
+                "source_url": link,
+                "source_type": "news",
+                "source_name": source,
+                "published_date": date,
+                "search_query": query,
+                "relevance_score": 7,  # News items are generally more relevant
+                "content_type": "news_article",
+                "extracted_at": datetime.utcnow().isoformat()
+            }
+        except Exception as e:
+            self.log_message(f"Error extracting news trend: {e}", level="warning")
+            return None
+    
+    def extract_trend_from_search_result(self, result: Dict[str, Any], category: str, query: str) -> Dict[str, Any]:
+        """Extract trend information from a general search result"""
+        try:
+            title = result.get("title", "")
+            snippet = result.get("snippet", "")
+            link = result.get("link", "")
+            
+            if not title or len(title) < 10:
+                return None
+                
+            return {
+                "title": title,
+                "summary": snippet,
+                "category": category,
+                "source_url": link,
+                "source_type": "web",
+                "source_name": link.split("//")[-1].split("/")[0] if link else "",
+                "published_date": "",
+                "search_query": query,
+                "relevance_score": 5,  # General results are less relevant than news
+                "content_type": "web_page",
+                "extracted_at": datetime.utcnow().isoformat()
+            }
+        except Exception as e:
+            self.log_message(f"Error extracting search trend: {e}", level="warning")
+            return None
     
     def extract_trends_from_content(self, content: str, topics: List[str], source_url: str, source_type: str) -> List[Dict[str, Any]]:
         """Extract trending topics from scraped content using AI"""

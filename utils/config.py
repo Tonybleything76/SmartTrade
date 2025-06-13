@@ -144,8 +144,9 @@ class Config:
         if not self.api.openai_api_key:
             validation_errors.append("OPENAI_API_KEY is required")
         
+        # LinkedIn token is optional - system can run without publishing capability
         if not self.api.linkedin_access_token:
-            validation_errors.append("LINKEDIN_ACCESS_TOKEN is required for LinkedIn publishing")
+            print("Warning: LINKEDIN_ACCESS_TOKEN not provided - publishing will be disabled")
         
         # Validate content settings
         if self.content.min_content_length >= self.content.max_content_length:
