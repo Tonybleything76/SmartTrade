@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent Content System - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header -->
+        <header class="row bg-primary text-white py-3 mb-4">
+            <div class="col">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-robot me-2"></i>
+                    Multi-Agent Content System
+                </h1>
+                <small class="text-light">AI-Powered LinkedIn Content Generation</small>
+            </div>
+            <div class="col-auto">
+                <div class="d-flex align-items-center">
+                    <div class="status-indicator me-3">
+                        <span class="badge bg-{% if data.system_status == 'idle' %}success{% elif data.system_status in ['researching', 'generating', 'editing', 'scheduling'] %}warning{% elif data.system_status == 'failed' %}danger{% else %}secondary{% endif %}">
+                            <i class="fas fa-circle me-1"></i>
+                            {{ data.system_status|title if data.system_status else 'Unknown' }}
+                        </span>
+                    </div>
+                    <button id="refreshBtn" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        {% if data.error %}
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ data.error }}
+        </div>
+        {% endif %}
+
+        <!-- Main Content -->
+        <div class="row">
+            <!-- Left Column - System Overview -->
+            <div class="col-lg-8">
+                <!-- System Status Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-0">Total Workflows</h5>
+                                        <h3 class="mb-0">{{ data.metrics.total_workflows or 0 }}</h3>
+                                    </div>
+                                    <i class="fas fa-cogs fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-0">Success Rate</h5>
+                                        <h3 class="mb-0">
+                                            {% if data.metrics.total_workflows and data.metrics.total_workflows > 0 %}
+                                                {{ "%.1f"|format((data.metrics.successful_workflows / data.metrics.total_workflows * 100)) }}%
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </h3>
+                                    </div>
+                                    <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-0">Today's Content</h5>
+                                        <h3 class="mb-0">{{ data.today_stats.content_generated or 0 }}</h3>
+                                    </div>
+                                    <i class="fas fa-file-alt fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-dark">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-0">Avg Duration</h5>
+                                        <h3 class="mb-0">
+                                            {% if data.metrics.average_duration_seconds %}
+                                                {{ "%.0f"|format(data.metrics.average_duration_seconds) }}s
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </h3>
+                                    </div>
+                                    <i class="fas fa-clock fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Workflow Status -->
+                {% if data.current_run_id %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-play-circle me-2"></i>
+                            Current Workflow
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Run ID:</strong> {{ data.current_run_id }}<br>
+                                <strong>Status:</strong> 
+                                <span class="badge bg-{% if data.system_status == 'completed' %}success{% elif data.system_status == 'failed' %}danger{% else %}primary{% endif %}">
+                                    {{ data.system_status|title }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="progress mt-3">
+                            <div class="progress-bar 
+                                {% if data.system_status == 'researching' %}bg-info{% elif data.system_status == 'generating' %}bg-warning{% elif data.system_status == 'editing' %}bg-primary{% elif data.system_status == 'scheduling' %}bg-success{% elif data.system_status == 'completed' %}bg-success{% elif data.system_status == 'failed' %}bg-danger{% else %}bg-secondary{% endif %}" 
+                                role="progressbar" 
+                                style="width: {% if data.system_status == 'researching' %}25{% elif data.system_status == 'generating' %}50{% elif data.system_status == 'editing' %}75{% elif data.system_status in ['scheduling', 'completed'] %}100{% else %}0{% endif %}%">
+                                {{ data.system_status|title }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Manual Controls -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-hand-paper me-2"></i>
+                            Manual Controls
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button id="triggerPipelineBtn" class="btn btn-primary w-100 mb-2" 
+                                        {% if data.system_status not in ['idle', 'completed', 'failed'] %}disabled{% endif %}>
+                                    <i class="fas fa-play me-2"></i>
+                                    Trigger Content Pipeline
+                                </button>
+                                <small class="text-muted">Manually start content generation process</small>
+                            </div>
+                            <div class="col-md-6">
+                                <button id="retryFailedBtn" class="btn btn-warning w-100 mb-2">
+                                    <i class="fas fa-redo me-2"></i>
+                                    Retry Failed Posts
+                                </button>
+                                <small class="text-muted">Retry any failed scheduling attempts</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Workflow Runs -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history me-2"></i>
+                            Recent Workflow Runs
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if data.recent_runs %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Run ID</th>
+                                        <th>Started</th>
+                                        <th>Status</th>
+                                        <th>Duration</th>
+                                        <th>Content</th>
+                                        <th>Trigger</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for run in data.recent_runs %}
+                                    <tr>
+                                        <td><code>{{ run.run_id[:8] }}...</code></td>
+                                        <td>{{ run.started_at[:19] if run.started_at else 'N/A' }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if run.success %}success{% else %}danger{% endif %}">
+                                                {% if run.success %}Success{% else %}Failed{% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if run.duration_seconds %}
+                                                {{ "%.0f"|format(run.duration_seconds) }}s
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ run.content_generated|length if run.content_generated else 0 }}</td>
+                                        <td>
+                                            {% if run.manual_trigger %}
+                                                <i class="fas fa-hand-paper text-primary" title="Manual"></i>
+                                            {% else %}
+                                                <i class="fas fa-clock text-secondary" title="Scheduled"></i>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                            <p>No workflow runs found</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Agents & System Info -->
+            <div class="col-lg-4">
+                <!-- System Health -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-heartbeat me-2"></i>
+                            System Health
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-grow-1">
+                                <strong>Overall Status:</strong>
+                            </div>
+                            <span class="badge bg-{% if data.system_health.overall == 'healthy' %}success{% elif data.system_health.overall == 'degraded' %}warning{% else %}danger{% endif %}">
+                                {{ data.system_health.overall|title if data.system_health.overall else 'Unknown' }}
+                            </span>
+                        </div>
+                        
+                        {% if data.system_health.issues %}
+                        <div class="alert alert-warning alert-sm p-2">
+                            <small>
+                                <strong>Issues:</strong><br>
+                                {% for issue in data.system_health.issues %}
+                                • {{ issue }}<br>
+                                {% endfor %}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Agents Status -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2"></i>
+                            AI Agents Status
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if data.agents_status %}
+                        {% for agent_name, agent_info in data.agents_status.items() %}
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="flex-grow-1">
+                                <strong>{{ agent_name.replace('_', ' ')|title }}</strong><br>
+                                <small class="text-muted">{{ agent_info.name if agent_info.name else agent_name }}</small>
+                            </div>
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle"></i> Active
+                            </span>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center text-muted">
+                            <i class="fas fa-robot fa-2x mb-2"></i>
+                            <p>No agents information available</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Scheduler Status -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Content Scheduler
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="schedulerStatus">
+                            <div class="text-center">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <small class="text-muted ms-2">Loading scheduler status...</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuration Summary -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cog me-2"></i>
+                            Configuration
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if config %}
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <small class="text-muted">Daily Posts:</small>
+                                <div><strong>{{ config.content.daily_post_count }}</strong></div>
+                            </div>
+                            <div class="col-12">
+                                <small class="text-muted">Posting Times:</small>
+                                <div>
+                                    {% for time in config.content.posting_times %}
+                                    <span class="badge bg-secondary me-1">{{ time }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <small class="text-muted">API Status:</small>
+                                <div>
+                                    <span class="badge bg-{% if config.api.openai_configured %}success{% else %}danger{% endif %} me-1">
+                                        OpenAI {% if config.api.openai_configured %}✓{% else %}✗{% endif %}
+                                    </span>
+                                    <span class="badge bg-{% if config.api.linkedin_configured %}success{% else %}warning{% endif %} me-1">
+                                        LinkedIn {% if config.api.linkedin_configured %}✓{% else %}✗{% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="actionToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong class="me-auto">System</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                <!-- Toast message will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-refresh functionality
+        let autoRefreshInterval;
+        
+        function startAutoRefresh() {
+            autoRefreshInterval = setInterval(() => {
+                location.reload();
+            }, 30000); // Refresh every 30 seconds
+        }
+        
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+        }
+        
+        // Start auto-refresh on page load
+        startAutoRefresh();
+        
+        // Manual refresh button
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            location.reload();
+        });
+        
+        // Manual pipeline trigger
+        document.getElementById('triggerPipelineBtn').addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Starting...';
+            
+            fetch('/api/trigger-pipeline', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Content pipeline started successfully!', 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showToast('Failed to start pipeline: ' + data.error, 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            })
+            .catch(error => {
+                showToast('Error: ' + error.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
+        });
+        
+        // Retry failed posts
+        document.getElementById('retryFailedBtn').addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Retrying...';
+            
+            fetch('/api/retry-failed', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const count = data.data?.retried_count || 0;
+                    showToast(`Retried ${count} failed posts`, 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showToast('Failed to retry posts: ' + data.error, 'error');
+                }
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            })
+            .catch(error => {
+                showToast('Error: ' + error.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
+        });
+        
+        // Load scheduler status
+        function loadSchedulerStatus() {
+            fetch('/api/scheduler-status')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('schedulerStatus');
+                
+                if (data.success) {
+                    const stats = data.data?.queue_statistics || {};
+                    const nextPosts = data.data?.next_posts || [];
+                    
+                    let html = `
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <small class="text-muted">Queued:</small>
+                                <div><strong>${stats.scheduled || 0}</strong></div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Failed:</small>
+                                <div><strong>${stats.failed || 0}</strong></div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    if (nextPosts.length > 0) {
+                        html += '<small class="text-muted">Next Posts:</small>';
+                        nextPosts.slice(0, 3).forEach(post => {
+                            const scheduledTime = new Date(post.scheduled_time);
+                            html += `
+                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                    <small>${scheduledTime.toLocaleTimeString()}</small>
+                                    <span class="badge bg-primary">${post.status}</span>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center text-muted">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <small>Unable to load scheduler status</small>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('schedulerStatus').innerHTML = `
+                    <div class="text-center text-muted">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <small>Error loading scheduler status</small>
+                    </div>
+                `;
+            });
+        }
+        
+        // Load scheduler status on page load
+        loadSchedulerStatus();
+        
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('actionToast');
+            const toastBody = toast.querySelector('.toast-body');
+            const toastHeader = toast.querySelector('.toast-header');
+            
+            // Set message
+            toastBody.textContent = message;
+            
+            // Set color based on type
+            toast.className = 'toast';
+            if (type === 'success') {
+                toast.classList.add('bg-success', 'text-white');
+            } else if (type === 'error') {
+                toast.classList.add('bg-danger', 'text-white');
+            } else if (type === 'warning') {
+                toast.classList.add('bg-warning', 'text-dark');
+            }
+            
+            // Show toast
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+        
+        // Stop auto-refresh when user is inactive
+        let userInactive = false;
+        let inactivityTimer;
+        
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            if (userInactive) {
+                userInactive = false;
+                startAutoRefresh();
+            }
+            
+            inactivityTimer = setTimeout(() => {
+                userInactive = true;
+                stopAutoRefresh();
+            }, 300000); // 5 minutes of inactivity
+        }
+        
+        // Track user activity
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+            document.addEventListener(event, resetInactivityTimer, true);
+        });
+        
+        resetInactivityTimer();
+    </script>
+</body>
+</html>
