@@ -30,50 +30,54 @@ class TrendResearcherAgent(BaseAgent):
         # Initialize SerpAPI client
         self.serpapi_key = os.getenv("SERPAPI_API_KEY")
         
-        # Search query configurations for different AI topics
+        # Search query configurations for consulting business focus areas
         self.search_queries = {
-            "ai_innovation": [
-                "AI innovation 2024 breakthrough",
-                "artificial intelligence new technology",
-                "AI startup funding news",
-                "machine learning breakthrough"
+            "business_optimization": [
+                "business process optimization AI",
+                "operational efficiency consulting",
+                "digital transformation strategy",
+                "business automation trends"
             ],
-            "generative_ai": [
-                "generative AI news 2024",
-                "GPT ChatGPT latest updates",
-                "AI content generation tools",
-                "text to image AI models"
+            "ai_innovation_strategy": [
+                "AI innovation strategy consulting",
+                "AI implementation roadmap",
+                "enterprise AI strategy",
+                "AI transformation planning"
             ],
-            "ai_for_professionals": [
-                "AI tools for professionals",
-                "workplace AI automation",
-                "AI productivity software",
-                "business AI implementation"
+            "ai_implementation": [
+                "AI implementation best practices",
+                "AI adoption methodology",
+                "AI integration challenges",
+                "enterprise AI deployment"
             ],
-            "agentic_systems": [
-                "AI agents autonomous systems",
-                "multi-agent AI systems",
-                "AI workflow automation",
-                "intelligent agent frameworks"
+            "workshop_design": [
+                "corporate workshop facilitation",
+                "innovation workshop design",
+                "team collaboration workshops",
+                "strategic planning workshops"
             ],
-            "tech_integration": [
-                "AI integration enterprise",
-                "AI technology roadmap",
-                "AI adoption trends",
-                "AI transformation strategy"
+            "design_thinking": [
+                "Design Thinking methodology",
+                "Design Thinking business innovation",
+                "human-centered design consulting",
+                "Design Thinking workshop training"
+            ],
+            "ai_tool_development": [
+                "custom AI solution development",
+                "AI tool implementation",
+                "business AI applications",
+                "AI software development trends"
             ]
         }
         
-        # Topic categories for filtering
+        # Topic categories for consulting business focus
         self.topic_categories = [
-            "AI Innovation",
-            "Generative AI",
-            "Technology Roadmaps & Integration", 
-            "AI for Professionals",
-            "Agentic Systems",
-            "Machine Learning",
-            "Neural Networks",
-            "AI Ethics"
+            "Business Optimization",
+            "AI Innovation Strategy", 
+            "AI Implementation",
+            "Workshop Design",
+            "Design Thinking",
+            "AI Tool Development"
         ]
     
     def execute_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:

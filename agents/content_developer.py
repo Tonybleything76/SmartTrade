@@ -33,12 +33,12 @@ class ContentDeveloperAgent(BaseAgent):
             "cta_types": ["question", "action", "discussion_starter", "resource_share"]
         }
         
-        # Brand voice guidelines
+        # Brand voice guidelines for consulting business
         self.brand_guidelines = {
-            "voice": "Authoritative yet approachable AI expert",
-            "personality": ["innovative", "insightful", "practical", "forward-thinking"],
-            "avoid": ["hype", "overpromising", "technical jargon without explanation"],
-            "focus": "Value for AI professionals and business leaders"
+            "voice": "Expert consultant specializing in business optimization and AI innovation",
+            "personality": ["strategic", "practical", "results-driven", "collaborative"],
+            "avoid": ["theoretical concepts without practical application", "overly technical language", "generic advice"],
+            "focus": "Actionable insights for business leaders seeking AI transformation and optimization"
         }
         
         # Post format templates (Rich Text Format)
@@ -156,9 +156,11 @@ class ContentDeveloperAgent(BaseAgent):
             # the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
             # do not change this unless explicitly requested by the user
             content_prompt = f"""
-            You are an expert AI content creator specializing in LinkedIn posts for AI professionals and business leaders.
+            You are an expert business consultant and content creator specializing in business optimization, AI innovation strategies, and organizational transformation.
             
-            Create a high-quality LinkedIn post based on this trending AI topic:
+            Create a high-quality LinkedIn post that positions expertise in consulting services including business optimization, AI implementation strategies, workshop design, Design Thinking facilitation, and AI tool development.
+            
+            Base the post on this trending topic:
             
             Title: {trend.get('title', '')}
             Summary: {trend.get('summary', '')}
@@ -177,19 +179,26 @@ class ContentDeveloperAgent(BaseAgent):
             Template Type: {template_type}
             
             Generate content with these components:
-            1. Hook (attention-grabbing opening line with emoji)
-            2. Main insight or analysis (2-3 paragraphs)
-            3. Professional implications (bullet points or numbered list)
+            1. Hook (attention-grabbing opening that positions consulting expertise)
+            2. Strategic insight or analysis connecting to business optimization challenges (2-3 paragraphs)
+            3. Actionable implications for business leaders (bullet points focusing on practical next steps)
             4. Call to action: "Ready to future-proof your career in the AI era? Enroll in The AI Ready Professional course and master the skills you need to thrive. Learn more: https://adeptly.thinkific.com/products/courses/ai-ready-professional-course"
-            5. Relevant hashtags (5-8 hashtags)
+            5. Relevant hashtags (5-8 hashtags focusing on business transformation, consulting, and optimization)
+            
+            Content Focus Areas:
+            - Business process optimization and efficiency gains
+            - AI implementation strategies and roadmaps
+            - Workshop design and facilitation methodologies
+            - Design Thinking approaches for innovation
+            - Custom AI tool development and integration
             
             Requirements:
             - Format in Rich Text Format (RTF), not markdown
-            - Use bold formatting with **text** for key phrases
+            - Use bold formatting with **text** for key strategic concepts
             - Keep under {self.content_format['max_length']} characters
             - Use {self.content_format['tone']} tone
-            - Include practical value for AI professionals
-            - Make it engaging and shareable
+            - Provide actionable value for business leaders and decision makers
+            - Position expertise in consulting and transformation services
             - Always include the specific call-to-action for The AI Ready Professional course
             
             Respond with JSON:
