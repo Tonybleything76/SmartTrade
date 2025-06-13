@@ -111,4 +111,5 @@ Publishing approach: LinkedIn optional for testing, X/Twitter postponed.
 Content format: Rich Text Format (RTF), not markdown.
 Call-to-action: All posts must include enrollment CTA for "The AI Ready Professional" course.
 Course link: https://adeptly.thinkific.com/products/courses/ai-ready-professional-course
+Business focus: Consulting services including business optimization, AI innovation strategies, AI implementation plans, workshop design and facilitation, Design Thinking workshops and training, and AI tool development.
 ```
