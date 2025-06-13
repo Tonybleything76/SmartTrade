@@ -176,7 +176,7 @@ class TrendResearcherAgent(BaseAgent):
         self.log_message(f"Found {len(trends)} trends from {category} searches")
         return trends
     
-    def extract_trend_from_news_item(self, news_item: Dict[str, Any], category: str, query: str) -> Dict[str, Any]:
+    def extract_trend_from_news_item(self, news_item: Dict[str, Any], category: str, query: str) -> Dict[str, Any] | None:
         """Extract trend information from a news search result"""
         try:
             title = news_item.get("title", "")

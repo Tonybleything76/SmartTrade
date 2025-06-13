@@ -34,12 +34,19 @@ class MultiAgentContentSystem:
             logger.info("Initializing Multi-Agent Content System...")
             
             # Validate required environment variables
-            required_vars = ['OPENAI_API_KEY', 'LINKEDIN_ACCESS_TOKEN']
+            required_vars = ['OPENAI_API_KEY']
             missing_vars = [var for var in required_vars if not os.getenv(var)]
             
             if missing_vars:
                 logger.error(f"Missing required environment variables: {missing_vars}")
                 return False
+            
+            # Check optional variables
+            if not os.getenv('LINKEDIN_ACCESS_TOKEN'):
+                logger.warning("LINKEDIN_ACCESS_TOKEN not provided - publishing features will be disabled")
+            
+            if not os.getenv('SERPAPI_API_KEY'):
+                logger.warning("SERPAPI_API_KEY not provided - trend research will use fallback methods")
                 
             # Initialize workflow
             if not self.workflow.initialize():
