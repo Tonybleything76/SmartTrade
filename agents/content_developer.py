@@ -41,51 +41,45 @@ class ContentDeveloperAgent(BaseAgent):
             "focus": "Value for AI professionals and business leaders"
         }
         
-        # Post format templates
+        # Post format templates (Rich Text Format)
         self.post_templates = {
-            "insight_sharing": """
-🔥 {hook}
+            "insight_sharing": """{hook}
 
 {main_insight}
 
-Here's what this means for AI professionals:
+**Here's what this means for AI professionals:**
 {professional_implications}
 
 {call_to_action}
 
-{hashtags}
-            """,
+{hashtags}""",
             
-            "trend_analysis": """
-📈 {trend_title}
+            "trend_analysis": """{trend_title}
 
 {trend_explanation}
 
-Why this matters:
+**Why this matters:**
 • {point_1}
 • {point_2} 
 • {point_3}
 
 {call_to_action}
 
-{hashtags}
-            """,
+{hashtags}""",
             
-            "future_outlook": """
-🚀 The future of {topic_area}:
+            "future_outlook": """**The future of {topic_area}:**
 
 {future_vision}
 
-What we're seeing now:
+**What we're seeing now:**
 {current_developments}
 
-What to watch for:
+**What to watch for:**
 {future_indicators}
 
 {call_to_action}
 
-{hashtags}
-            """
+{hashtags}"""
         }
     
     def execute_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -186,22 +180,24 @@ What to watch for:
             1. Hook (attention-grabbing opening line with emoji)
             2. Main insight or analysis (2-3 paragraphs)
             3. Professional implications (bullet points or numbered list)
-            4. Call to action (engaging question or action request)
+            4. Call to action: "Ready to future-proof your career in the AI era? Enroll in The AI Ready Professional course and master the skills you need to thrive. Learn more: https://adeptly.thinkific.com/products/courses/ai-ready-professional-course"
             5. Relevant hashtags (5-8 hashtags)
             
             Requirements:
+            - Format in Rich Text Format (RTF), not markdown
+            - Use bold formatting with **text** for key phrases
             - Keep under {self.content_format['max_length']} characters
             - Use {self.content_format['tone']} tone
             - Include practical value for AI professionals
             - Make it engaging and shareable
-            - Bold key phrases for emphasis
+            - Always include the specific call-to-action for The AI Ready Professional course
             
             Respond with JSON:
             {{
                 "hook": "Engaging opening with emoji",
                 "main_content": "Main insight and analysis paragraphs",
                 "implications": ["implication1", "implication2", "implication3"],
-                "call_to_action": "Engaging CTA question or request",
+                "call_to_action": "Ready to future-proof your career in the AI era? Enroll in The AI Ready Professional course and master the skills you need to thrive. Learn more: https://adeptly.thinkific.com/products/courses/ai-ready-professional-course",
                 "hashtags": ["#AI", "#Innovation", "#TechLeadership", "#ArtificialIntelligence", "#FutureOfWork"],
                 "key_phrases": ["phrase1", "phrase2"]
             }}
@@ -230,7 +226,8 @@ What to watch for:
             hook = content_components.get("hook", "")
             main_content = content_components.get("main_content", "")
             implications = content_components.get("implications", [])
-            cta = content_components.get("call_to_action", "")
+            # Always use the specific CTA for The AI Ready Professional course
+            cta = "Ready to future-proof your career in the AI era? Enroll in The AI Ready Professional course and master the skills you need to thrive. Learn more: https://adeptly.thinkific.com/products/courses/ai-ready-professional-course"
             hashtags = content_components.get("hashtags", [])
             key_phrases = content_components.get("key_phrases", [])
             
