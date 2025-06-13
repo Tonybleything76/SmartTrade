@@ -97,6 +97,8 @@ Changelog:
 - June 13, 2025. System running with 6 AI agents initialized
 - June 13, 2025. Successfully completed full pipeline test with authentic data
 - June 13, 2025. Generated 3 professional LinkedIn posts from 271 real trending topics
+- June 13, 2025. Added comprehensive content review interface with manual posting controls
+- June 13, 2025. Updated content format to Rich Text Format with specific CTA for The AI Ready Professional course
 ```
 
 ## User Preferences
@@ -105,4 +107,7 @@ Changelog:
 Preferred communication style: Simple, everyday language.
 API priorities: Focus on OpenAI and SerpAPI first, hold on X/Twitter integration for now.
 Publishing approach: LinkedIn optional for testing, X/Twitter postponed.
+Content format: Rich Text Format (RTF), not markdown.
+Call-to-action: All posts must include enrollment CTA for "The AI Ready Professional" course.
+Course link: https://adeptly.thinkific.com/products/courses/ai-ready-professional-course
 ```
