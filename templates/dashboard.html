@@ -53,7 +53,7 @@
                                 <div class="d-flex align-items-center">
                                     <div class="flex-grow-1">
                                         <h5 class="card-title mb-0">Total Workflows</h5>
-                                        <h3 class="mb-0">{{ data.metrics.total_workflows or 0 }}</h3>
+                                        <h3 class="mb-0">{{ (data.get('metrics', {}).get('total_workflows', 0)) }}</h3>
                                     </div>
                                     <i class="fas fa-cogs fa-2x opacity-75"></i>
                                 </div>
@@ -67,8 +67,9 @@
                                     <div class="flex-grow-1">
                                         <h5 class="card-title mb-0">Success Rate</h5>
                                         <h3 class="mb-0">
-                                            {% if data.metrics.total_workflows and data.metrics.total_workflows > 0 %}
-                                                {{ "%.1f"|format((data.metrics.successful_workflows / data.metrics.total_workflows * 100)) }}%
+                                            {% set metrics = data.get('metrics', {}) %}
+                                            {% if metrics.get('total_workflows', 0) > 0 %}
+                                                {{ "%.1f"|format((metrics.get('successful_workflows', 0) / metrics.get('total_workflows', 1) * 100)) }}%
                                             {% else %}
                                                 N/A
                                             {% endif %}
@@ -143,6 +144,29 @@
                     </div>
                 </div>
                 {% endif %}
+
+                <!-- Content Review Section -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-edit me-2"></i>
+                            Content Review & Publishing
+                        </h5>
+                        <button id="refreshContentBtn" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="scheduledPosts" class="row">
+                            <!-- Scheduled posts will be loaded here via JavaScript -->
+                        </div>
+                        <div class="text-center mt-3">
+                            <div class="spinner-border text-primary" role="status" id="contentLoader">
+                                <span class="visually-hidden">Loading content...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Manual Controls -->
                 <div class="card mb-4">
