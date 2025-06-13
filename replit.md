@@ -92,10 +92,15 @@ The system is designed to run continuously, with the scheduler managing automate
 ```
 Changelog:
 - June 13, 2025. Initial setup
+- June 13, 2025. Updated to use SerpAPI instead of trafilatura for trend research
+- June 13, 2025. Made LinkedIn credentials optional for testing
+- June 13, 2025. System running with 6 AI agents initialized
 ```
 
 ## User Preferences
 
 ```
 Preferred communication style: Simple, everyday language.
+API priorities: Focus on OpenAI and SerpAPI first, hold on X/Twitter integration for now.
+Publishing approach: LinkedIn optional for testing, X/Twitter postponed.
 ```
