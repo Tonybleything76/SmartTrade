@@ -307,6 +307,11 @@ def create_app():
     def content_review():
         """Content review page"""
         return render_template('content_review.html')
+    
+    @app.route('/roadmap-generator')
+    def roadmap_generator():
+        """AI Implementation Roadmap Generator page"""
+        return render_template('roadmap_generator.html')
 
     @app.route('/api/publish-now', methods=['POST'])
     def api_publish_now():
@@ -446,6 +451,69 @@ def create_app():
                 "success": True,
                 "data": metrics
             })
+            
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
+    
+    @app.route('/api/generate-roadmap', methods=['POST'])
+    def api_generate_roadmap():
+        """API endpoint to generate AI implementation roadmap"""
+        try:
+            workflow = get_workflow()
+            if not workflow:
+                return jsonify({"success": False, "error": "Workflow not initialized"}), 500
+            
+            roadmap_agent = workflow.agents.get('roadmap_generator')
+            if not roadmap_agent:
+                return jsonify({"success": False, "error": "Roadmap generator not available"}), 500
+            
+            # Get request data
+            request_data = request.get_json()
+            
+            # Generate roadmap
+            result = roadmap_agent.execute_task({
+                "task_type": "generate_roadmap",
+                "business_context": request_data.get("business_context", {}),
+                "ai_objectives": request_data.get("ai_objectives", []),
+                "timeline": request_data.get("timeline", "12 months"),
+                "budget_range": request_data.get("budget_range", "moderate"),
+                "industry": request_data.get("industry", "general"),
+                "company_size": request_data.get("company_size", "medium")
+            })
+            
+            return jsonify(result)
+            
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
+    
+    @app.route('/api/assess-readiness', methods=['POST'])
+    def api_assess_readiness():
+        """API endpoint to assess organizational readiness for AI"""
+        try:
+            workflow = get_workflow()
+            if not workflow:
+                return jsonify({"success": False, "error": "Workflow not initialized"}), 500
+            
+            roadmap_agent = workflow.agents.get('roadmap_generator')
+            if not roadmap_agent:
+                return jsonify({"success": False, "error": "Roadmap generator not available"}), 500
+            
+            # Get assessment data
+            request_data = request.get_json()
+            
+            # Assess readiness
+            result = roadmap_agent.execute_task({
+                "task_type": "assess_readiness",
+                **request_data
+            })
+            
+            return jsonify(result)
             
         except Exception as e:
             return jsonify({

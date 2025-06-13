@@ -15,6 +15,7 @@ from agents.content_developer import ContentDeveloperAgent
 from agents.content_editor import ContentEditorAgent
 from agents.distribution import DistributionAgent
 from agents.scheduler import SchedulerAgent
+from agents.roadmap_generator import RoadmapGeneratorAgent
 from agents.base_agent import AgentCommunicationHub
 from utils.logger import setup_logger, system_logger
 from utils.config import get_config
@@ -81,7 +82,8 @@ class ContentWorkflow:
                 ("content_developer", ContentDeveloperAgent),
                 ("content_editor", ContentEditorAgent),
                 ("distribution", DistributionAgent),
-                ("scheduler", SchedulerAgent)
+                ("scheduler", SchedulerAgent),
+                ("roadmap_generator", RoadmapGeneratorAgent)
             ]
             
             for agent_name, agent_class in agent_classes:
