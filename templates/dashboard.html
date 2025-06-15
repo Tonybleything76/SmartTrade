@@ -27,6 +27,12 @@
                             {{ data.system_status|title if data.system_status else 'Unknown' }}
                         </span>
                     </div>
+                    <a href="/roadmap-generator" class="btn btn-success btn-sm me-2">
+                        <i class="fas fa-route"></i> AI Roadmap Generator
+                    </a>
+                    <a href="/content-review" class="btn btn-outline-light btn-sm me-2">
+                        <i class="fas fa-edit"></i> Content Review
+                    </a>
                     <button id="refreshBtn" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-sync-alt"></i> Refresh
                     </button>
@@ -34,22 +40,22 @@
             </div>
         </header>
 
-        <!-- Navigation Menu -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-            <div class="container-fluid">
-                <div class="navbar-nav">
-                    <a class="nav-link active" href="/">
+        <!-- Quick Navigation -->
+        <div class="row mb-3">
+            <div class="col">
+                <div class="d-flex gap-2">
+                    <a href="/" class="btn btn-primary">
                         <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                     </a>
-                    <a class="nav-link" href="/content-review">
+                    <a href="/content-review" class="btn btn-outline-primary">
                         <i class="fas fa-edit me-1"></i>Content Review
                     </a>
-                    <a class="nav-link" href="/roadmap-generator">
-                        <i class="fas fa-route me-1"></i>Roadmap Generator
+                    <a href="/roadmap-generator" class="btn btn-outline-success">
+                        <i class="fas fa-route me-1"></i>AI Roadmap Generator
                     </a>
                 </div>
             </div>
-        </nav>
+        </div>
 
         {% if data.error %}
         <div class="alert alert-danger" role="alert">
