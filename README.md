@@ -47,24 +47,53 @@ This system orchestrates 7 specialized AI agents to create authentic, brand-alig
 
 ### Prerequisites
 - Python 3.11+
-- OpenAI API key
-- SerpAPI key
+- OpenAI API key (required)
+- SerpAPI key (required) 
 - LinkedIn API credentials (optional for testing)
 
 ### Installation
-1. Clone the repository
-2. Install dependencies: `pip install -r requirements.txt`
-3. Configure environment variables in Replit Secrets:
-   - `OPENAI_API_KEY`
-   - `SERPAPI_API_KEY` 
-   - `LINKEDIN_ACCESS_TOKEN` (optional)
 
-### Running the System
+#### Option 1: Using Make (Recommended)
 ```bash
+# Initial setup with environment configuration
+make setup
+
+# Install dependencies
+make install
+
+# Run the system
+make run
+```
+
+#### Option 2: Manual Setup
+```bash
+# 1. Copy environment template
+cp .env.example .env
+
+# 2. Edit .env with your API keys
+# Add your OPENAI_API_KEY and SERPAPI_API_KEY
+
+# 3. Install dependencies
+pip install -e .
+
+# 4. Run the system
 python main.py
 ```
 
-Access the dashboard at `http://localhost:5000`
+#### Option 3: Docker
+```bash
+# Copy environment file
+cp .env.example .env
+# Edit .env with your API keys
+
+# Run with Docker Compose
+docker-compose up -d
+```
+
+### Access the System
+- **Dashboard**: `http://localhost:5000`
+- **Content Review**: `http://localhost:5000/content-review`
+- **Roadmap Generator**: `http://localhost:5000/roadmap-generator`
 
 ## 📋 Usage
 

@@ -8,9 +8,20 @@ import os
 import threading
 import time
 from datetime import datetime
+from pathlib import Path
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from flask import Flask
+
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    env_path = Path('.') / '.env'
+    if env_path.exists():
+        load_dotenv(env_path)
+        print("Loaded configuration from .env file")
+except ImportError:
+    print("python-dotenv not available, using system environment variables")
 
 from workflow import ContentWorkflow
 from web_interface import create_app
