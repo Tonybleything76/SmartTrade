@@ -204,23 +204,55 @@ docker-compose up -d
 
 ## 🛠️ Development
 
+### Getting Started with Development
+```bash
+# Setup development environment
+make setup
+
+# Install with development dependencies
+make install
+
+# Run tests
+make test
+
+# View system logs
+make logs
+```
+
+### Project Structure
+```
+├── agents/              # AI agent implementations
+├── utils/               # Configuration and logging utilities
+├── templates/           # Web interface templates
+├── static/              # CSS and static assets
+├── tests/               # Unit tests
+├── logs/                # Application logs (created at runtime)
+├── data/                # Persistent data storage (created at runtime)
+├── main.py              # Application entry point
+├── workflow.py          # Workflow orchestration
+├── web_interface.py     # Flask web dashboard
+├── .env.example         # Environment template
+├── Makefile             # Development commands
+└── docker-compose.yml   # Container deployment
+```
+
 ### Adding New Agents
 1. Extend `BaseAgent` class in `/agents/`
 2. Implement required methods and capabilities
 3. Register agent in workflow initialization
 4. Add agent-specific API endpoints
 
-### Customizing Content Templates
-- Modify templates in `ContentDeveloperAgent`
-- Adjust brand guidelines and voice parameters
-- Update content format specifications
-- Configure industry-specific terminology
+### Testing
+```bash
+# Run all tests
+make test
 
-### Extending Roadmap Frameworks
-- Add new implementation methodologies
-- Customize risk assessment categories
-- Include additional workshop types
-- Expand industry-specific recommendations
+# Run specific test module
+python -m pytest tests/test_agents.py -v
+
+# Run with coverage
+python -m pytest tests/ --cov=agents --cov-report=html
+```
 
 ## 🔒 Security & Privacy
 
